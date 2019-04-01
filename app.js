@@ -10,6 +10,10 @@ const PORT = process.env.PORT || 3000
 
 app.use(express.static(path.join(__dirname, '/public')))
 app.use(bodyParser.urlencoded({ extended: true }))
+app.set('view engine', 'ejs')
+
+app.route('/')
+  .get((req, res, next) => res.redirect('/bar_graph_one'))
 
 app.route('/bar_graph_one')
   .get((req, res, next) => res.render('bar_graph_one'))
