@@ -25,10 +25,13 @@ const canvas = svg.append('g')
 function randomBiasedPoint (min, max, [...biases], weight) {
   const range = (max - min) + min
   const base = Math.random() * range
+  if (biases.length < 1) return base
   const mixRatio = Math.random() * weight
-  const mixRatioSplit = mixRatio / biases.length
+  const allRelatives = biases.reduce((acc, each) => acc += each.relative, 0)
+  const relatives = biases.map(each => each.relative / allRelatives)
   let bias = 0
-  biases.forEach(each => bias += each * mixRatioSplit)
+  biases.forEach((each, idx) => bias += each.target * (mixRatio * relatives[idx]))
+  console.log({ base, out: base * (1 - mixRatio) + bias, mixRatio, allRelatives, relatives, bias })
   const out = base * (1 - mixRatio) + bias
   return out
 }
@@ -36,8 +39,10 @@ function randomBiasedPoint (min, max, [...biases], weight) {
 
 const randomData = []
 for (let i=0; i<sampleSize; i++) {
-  randomData.push( randomBiasedPoint(0, 100, [25, 40], 1) )
+  randomData.push( randomBiasedPoint(0, 100, [{ target: 25, relative: 120 }, { target: 40, relative: 50 }], 1) )
 }
+
+console.log(randomBiasedPoint(0, 100, [], 1))
 
 const minVal = randomData.reduce((acc, each) => acc < each ? acc : each)
 const maxVal = randomData.reduce((acc, each) => acc > each ? acc : each)
